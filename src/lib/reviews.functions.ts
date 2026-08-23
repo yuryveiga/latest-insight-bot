@@ -8,7 +8,7 @@ export const getReviews = createServerFn({ method: "GET" }).handler(async () => 
       .from("google_reviews")
       .select("id, author, rating, relative_time, review_text, position, scraped_at")
       .order("position", { ascending: true })
-      .limit(10),
+      .limit(12),
     supabaseAdmin
       .from("review_scrape_runs")
       .select("status, found_count, error, created_at")
