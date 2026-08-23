@@ -25,7 +25,7 @@ export const Route = createFileRoute("/widget-preview")({
 function WidgetPreview() {
   const hostRef = useRef<HTMLDivElement>(null);
   const [limit, setLimit] = useState(10);
-  const [columns, setColumns] = useState(2);
+  const [perPage, setPerPage] = useState(3);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -34,7 +34,7 @@ function WidgetPreview() {
     const target = document.createElement("div");
     target.setAttribute("data-google-reviews", "");
     target.setAttribute("data-limit", String(limit));
-    target.setAttribute("data-columns", String(columns));
+    target.setAttribute("data-per-page", String(perPage));
     host.appendChild(target);
 
     const s = document.createElement("script");
@@ -44,7 +44,7 @@ function WidgetPreview() {
     return () => {
       s.remove();
     };
-  }, [limit, columns]);
+  }, [limit, perPage]);
 
   return (
     <main className="min-h-screen bg-background text-foreground px-4 py-10">
