@@ -70,6 +70,7 @@ export async function scrapeLatestReviews(): Promise<ScrapedReview[]> {
 
 
 export function fingerprint(r: ScrapedReview): string {
+  if (r.review_id) return r.review_id;
   return `${r.author}|${(r.review_text ?? "").slice(0, 120)}`.toLowerCase();
 }
 
