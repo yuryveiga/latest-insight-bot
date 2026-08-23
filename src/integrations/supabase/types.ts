@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      google_reviews: {
+        Row: {
+          author: string
+          created_at: string
+          fingerprint: string
+          id: string
+          position: number
+          rating: number | null
+          relative_time: string | null
+          review_text: string | null
+          scraped_at: string
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          fingerprint: string
+          id?: string
+          position?: number
+          rating?: number | null
+          relative_time?: string | null
+          review_text?: string | null
+          scraped_at?: string
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          fingerprint?: string
+          id?: string
+          position?: number
+          rating?: number | null
+          relative_time?: string | null
+          review_text?: string | null
+          scraped_at?: string
+        }
+        Relationships: []
+      }
+      review_scrape_runs: {
+        Row: {
+          created_at: string
+          error: string | null
+          found_count: number
+          id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          found_count?: number
+          id?: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          found_count?: number
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -10,33 +10,44 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicHooksScrapeReviewsRouteImport } from './routes/api/public/hooks/scrape-reviews'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksScrapeReviewsRoute =
+  ApiPublicHooksScrapeReviewsRouteImport.update({
+    id: '/api/public/hooks/scrape-reviews',
+    path: '/api/public/hooks/scrape-reviews',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/public/hooks/scrape-reviews'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/public/hooks/scrape-reviews'
+  id: '__root__' | '/' | '/api/public/hooks/scrape-reviews'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicHooksScrapeReviewsRoute: typeof ApiPublicHooksScrapeReviewsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +59,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/scrape-reviews': {
+      id: '/api/public/hooks/scrape-reviews'
+      path: '/api/public/hooks/scrape-reviews'
+      fullPath: '/api/public/hooks/scrape-reviews'
+      preLoaderRoute: typeof ApiPublicHooksScrapeReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicHooksScrapeReviewsRoute: ApiPublicHooksScrapeReviewsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
