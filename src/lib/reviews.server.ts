@@ -1,79 +1,73 @@
-const TARGET_URL =
-  "https://www.google.com.br/search?sca_esv=93bf05b8ac35d58d&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOYC1ZWaQaJ2_8W2vlbFkad7xchq12lDaF-pmq7nrTcapnqpNRlYe_58wx9IdpTJu0iAEhHNmwUOOIxT5SVnya2dV-7tHb4DDN-6x7coGoM2gpEGOSvszN5YUEzMm-2rFUr8pLfE%3D&q=Brazilian+Football+Experience+Coment%C3%A1rios&hl=pt-BR&sort=newest";
+// Local exato: "Brazilian Football Experience" (Google Maps place id)
+const PLACE_ID = "ChIJTYojf15_mQARNJDqBE-G5zs";
+const TARGET_URL = `https://www.google.com/maps/place/?q=place_id:${PLACE_ID}`;
 
-const FIRECRAWL_V2 = "https://api.firecrawl.dev/v2";
+const APIFY_ACTOR = "compass~Google-Maps-Reviews-Scraper";
 
 export type ScrapedReview = {
   author: string;
   rating: number | null;
   relative_time: string | null;
   review_text: string | null;
+  published_at?: string | null;
+  review_id?: string | null;
 };
 
-const reviewSchema = {
-  type: "object",
-  properties: {
-    reviews: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          author: { type: "string" },
-          rating: { type: "number" },
-          relative_time: { type: "string" },
-          review_text: { type: "string" },
-        },
-        required: ["author"],
-      },
-    },
-  },
-  required: ["reviews"],
+type ApifyReview = {
+  name?: string;
+  stars?: number;
+  publishAt?: string;
+  publishedAtDate?: string;
+  text?: string | null;
+  reviewId?: string;
+  placeId?: string;
 };
 
 export async function scrapeLatestReviews(): Promise<ScrapedReview[]> {
-  const apiKey = process.env["FIRECRAWL_API_KEY"];
-  if (!apiKey) throw new Error("FIRECRAWL_API_KEY não configurada");
+  const token = process.env["APIFY_TOKEN"];
+  if (!token) throw new Error("APIFY_TOKEN não configurado");
 
-  const res = await fetch(`${FIRECRAWL_V2}/scrape`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
+  const res = await fetch(
+    `https://api.apify.com/v2/acts/${APIFY_ACTOR}/run-sync-get-dataset-items`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        startUrls: [{ url: TARGET_URL }],
+        maxReviews: 10,
+        reviewsSort: "newest",
+        language: "pt-BR",
+        personalData: true,
+      }),
     },
-    body: JSON.stringify({
-      url: TARGET_URL,
-      onlyMainContent: false,
-      waitFor: 4000,
-      location: { country: "BR", languages: ["pt-BR"] },
-      formats: [
-        {
-          type: "json",
-          schema: reviewSchema,
-          prompt:
-            "Extraia as avaliações (reviews) do Google exibidas nesta página para 'Brazilian Football Experience'. Ordene das mais recentes para as mais antigas usando o tempo relativo (ex.: 'há 2 dias' é mais recente que 'há 1 mês'). Retorne no máximo 10. Campos: author (nome do autor), rating (nota 1-5), relative_time (tempo relativo como exibido), review_text (texto completo do comentário).",
-        },
-      ],
-    }),
-  });
+  );
 
-  const data = (await res.json()) as {
-    json?: { reviews?: ScrapedReview[] };
-    data?: { json?: { reviews?: ScrapedReview[] } };
-    error?: string;
-  };
+  const data = (await res.json()) as ApifyReview[] | { error?: { message?: string } };
 
-  if (!res.ok) {
-    throw new Error(data.error || `Firecrawl falhou [${res.status}]`);
+  if (!res.ok || !Array.isArray(data)) {
+    const msg = !Array.isArray(data) ? data?.error?.message : undefined;
+    throw new Error(msg || `Apify falhou [${res.status}]`);
   }
 
-  const reviews = data.json?.reviews ?? data.data?.json?.reviews ?? [];
-  return reviews.slice(0, 10).map((r) => ({
-    author: String(r.author ?? "Anônimo"),
-    rating: typeof r.rating === "number" ? r.rating : null,
-    relative_time: r.relative_time ?? null,
-    review_text: r.review_text ?? null,
-  }));
+  return data
+    .filter((r) => !r.placeId || r.placeId === PLACE_ID)
+    .sort((a, b) =>
+      String(b.publishedAtDate ?? "").localeCompare(String(a.publishedAtDate ?? "")),
+    )
+    .slice(0, 10)
+    .map((r) => ({
+      author: String(r.name ?? "Anônimo"),
+      rating: typeof r.stars === "number" ? r.stars : null,
+      relative_time: r.publishAt ?? null,
+      review_text: r.text ?? null,
+      published_at: r.publishedAtDate ?? null,
+      review_id: r.reviewId ?? null,
+    }));
 }
+
 
 export function fingerprint(r: ScrapedReview): string {
   return `${r.author}|${(r.review_text ?? "").slice(0, 120)}`.toLowerCase();
