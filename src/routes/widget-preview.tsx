@@ -25,7 +25,7 @@ export const Route = createFileRoute("/widget-preview")({
 function WidgetPreview() {
   const hostRef = useRef<HTMLDivElement>(null);
   const [limit, setLimit] = useState(10);
-  const [columns, setColumns] = useState(2);
+  const [perPage, setPerPage] = useState(3);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -34,7 +34,7 @@ function WidgetPreview() {
     const target = document.createElement("div");
     target.setAttribute("data-google-reviews", "");
     target.setAttribute("data-limit", String(limit));
-    target.setAttribute("data-columns", String(columns));
+    target.setAttribute("data-per-page", String(perPage));
     host.appendChild(target);
 
     const s = document.createElement("script");
@@ -44,7 +44,7 @@ function WidgetPreview() {
     return () => {
       s.remove();
     };
-  }, [limit, columns]);
+  }, [limit, perPage]);
 
   return (
     <main className="min-h-screen bg-background text-foreground px-4 py-10">
@@ -70,13 +70,13 @@ function WidgetPreview() {
             />
           </label>
           <label className="flex items-center gap-2">
-            Colunas:
+            Por slide:
             <input
               type="number"
               min={1}
-              max={4}
-              value={columns}
-              onChange={(e) => setColumns(Number(e.target.value))}
+              max={6}
+              value={perPage}
+              onChange={(e) => setPerPage(Number(e.target.value))}
               className="w-20 rounded border border-border bg-card px-2 py-1"
             />
           </label>
@@ -87,7 +87,7 @@ function WidgetPreview() {
         </div>
 
         <pre className="overflow-x-auto rounded-lg border border-border bg-muted p-4 text-xs">
-{`<div data-google-reviews data-limit="${limit}" data-columns="${columns}"></div>
+{`<div data-google-reviews data-limit="${limit}" data-per-page="${perPage}"></div>
 <script async src="https://latest-insight-bot.lovable.app/api/public/reviews-widget.js"></script>`}
         </pre>
       </div>
