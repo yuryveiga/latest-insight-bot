@@ -93,19 +93,26 @@ function Index() {
         ) : (
           <ol className="space-y-4">
             {reviews.map((r) => (
-              <li key={r.id} className="rounded-lg border border-border bg-card p-5 shadow-sm">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 className="font-semibold text-card-foreground">{r.author}</h2>
-                  <span className="text-xs text-muted-foreground">{r.relative_time}</span>
-                </div>
-                <div className="mt-1 text-sm">
-                  <Stars rating={r.rating} />
-                </div>
-                {r.review_text && (
-                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                    {r.review_text}
-                  </p>
-                )}
+              <li key={r.id}>
+                <a
+                  href="https://www.google.com.br/search?sca_esv=93bf05b8ac35d58d&sxsrf=ANbL-n7vf13wTowDz2wUU90tbYpN3_lUhg:1774101787455&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOYC1ZWaQaJ2_8W2vlbFkad7xchq12lDaF-pmq7nrTcapnqpNRlYe_58wx9IdpTJu0iAEhHNmwUOOIxT5SVnya2dV-7tHb4DDN-6x7coGoM2gpEGOSvszN5YUEzMm-2rFUr8pLfE%3D&q=Brazilian+Football+Experience+Coment%C3%A1rios&sa=X&ved=2ahUKEwjotdiWlLGTAxWaOrkGHYsQPT8Q0bkNegQIIRAH&biw=1920&bih=911&dpr=1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block rounded-lg border border-border bg-card p-5 shadow-sm transition-colors hover:border-accent hover:bg-accent/5"
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h2 className="font-semibold text-card-foreground">{r.author}</h2>
+                    <span className="text-xs text-muted-foreground">{r.relative_time}</span>
+                  </div>
+                  <div className="mt-1 text-sm">
+                    <Stars rating={r.rating} />
+                  </div>
+                  {r.review_text && (
+                    <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                      {r.review_text}
+                    </p>
+                  )}
+                </a>
               </li>
             ))}
           </ol>
