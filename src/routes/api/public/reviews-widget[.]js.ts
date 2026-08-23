@@ -21,6 +21,12 @@ const SCRIPT = `(function () {
       '<span class="gr-stars-off" aria-hidden="true">' + "\\u2605".repeat(Math.max(0, 5 - full)) + "</span></span>";
   }
 
+  function clamp(t, max) {
+    var w = String(t == null ? "" : t).trim().split(/\\s+/);
+    if (w.length <= max) return w.join(" ");
+    return w.slice(0, max).join(" ") + "\\u2026";
+  }
+
   function card(r) {
     var label = "Avaliação de " + (r.author || "visitante") +
       (r.rating != null ? ", " + Math.round(r.rating) + " de 5 estrelas" : "") +
@@ -29,7 +35,7 @@ const SCRIPT = `(function () {
       '<div class="gr-head"><p class="gr-author">' + esc(r.author) + "</p>" +
       '<span class="gr-time">' + esc(r.relative_time || "") + "</span></div>" +
       (r.rating != null ? stars(r.rating) : "") +
-      (r.review_text ? '<p class="gr-text">' + esc(r.review_text) + "</p>" : "") +
+      (r.review_text ? '<p class="gr-text">' + esc(clamp(r.review_text, 30)) + "</p>" : "") +
       "</a></li>";
   }
 
@@ -62,7 +68,13 @@ const SCRIPT = `(function () {
     + ".gr-more-wrap{display:flex;justify-content:center;margin-top:16px}"
     + ".gr-more{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 20px;border:1px solid currentColor;border-radius:999px;color:inherit;text-decoration:none;font-size:.9rem;font-weight:600;transition:background .2s}"
     + ".gr-more:hover{background:rgba(0,0,0,.06)}"
-    + "@media(prefers-reduced-motion:reduce){.gr-track{transition:none}.gr-card:hover{transform:none}}";
+    + ".gr-skel{display:grid;gap:16px;grid-template-columns:1fr}"
+    + "@media(min-width:640px){.gr-skel{grid-template-columns:repeat(2,1fr)}}"
+    + "@media(min-width:1024px){.gr-skel{grid-template-columns:repeat(3,1fr)}}"
+    + ".gr-skel-card{border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:18px;min-height:var(--gr-card-h,196px)}"
+    + ".gr-line{height:12px;border-radius:6px;background:currentColor;opacity:.12;margin-bottom:10px;animation:gr-pulse 1.4s ease-in-out infinite}"
+    + "@keyframes gr-pulse{0%,100%{opacity:.10}50%{opacity:.2}}"
+    + "@media(prefers-reduced-motion:reduce){.gr-track{transition:none}.gr-card:hover{transform:none}.gr-line{animation:none}}";
 
   function mount(el) {
     var limit = parseInt(el.getAttribute("data-limit") || "10", 10);
@@ -71,6 +83,18 @@ const SCRIPT = `(function () {
     var interval = Math.max(2000, parseInt(el.getAttribute("data-interval") || "6000", 10));
     perPage = Math.max(1, Math.min(6, perPage));
     var id = "gr" + ++uid;
+
+    el.classList.add("gr-widget");
+    el.style.minHeight = el.style.minHeight || "";
+    var skel = "";
+    for (var k = 0; k < perPage; k++) {
+      skel += '<div class="gr-skel-card"><div class="gr-line" style="width:45%"></div>' +
+        '<div class="gr-line" style="width:30%"></div><div class="gr-line"></div>' +
+        '<div class="gr-line"></div><div class="gr-line" style="width:70%"></div></div>';
+    }
+    el.innerHTML = "<style>" + css + "</style>" +
+      '<div class="gr-skel" role="status" aria-live="polite" aria-busy="true">' +
+      '<span class="gr-sr">Carregando avaliações\\u2026</span>' + skel + "</div>";
 
     fetch(base + "/api/public/reviews.json")
       .then(function (r) { return r.json(); })
