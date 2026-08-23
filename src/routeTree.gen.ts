@@ -10,11 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicReviewsWidgetDotjsRouteImport } from './routes/api/public/reviews-widget[.]js'
+import { Route as ApiPublicReviewsDotjsonRouteImport } from './routes/api/public/reviews[.]json'
 import { Route as ApiPublicHooksScrapeReviewsRouteImport } from './routes/api/public/hooks/scrape-reviews'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicReviewsWidgetDotjsRoute =
+  ApiPublicReviewsWidgetDotjsRouteImport.update({
+    id: '/api/public/reviews-widget.js',
+    path: '/api/public/reviews-widget.js',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicReviewsDotjsonRoute = ApiPublicReviewsDotjsonRouteImport.update({
+  id: '/api/public/reviews.json',
+  path: '/api/public/reviews.json',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHooksScrapeReviewsRoute =
@@ -26,27 +39,48 @@ const ApiPublicHooksScrapeReviewsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
+  '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
   '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
+  '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
   '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
+  '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
   '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/hooks/scrape-reviews'
+  fullPaths:
+    | '/'
+    | '/api/public/reviews-widget.js'
+    | '/api/public/reviews.json'
+    | '/api/public/hooks/scrape-reviews'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/hooks/scrape-reviews'
-  id: '__root__' | '/' | '/api/public/hooks/scrape-reviews'
+  to:
+    | '/'
+    | '/api/public/reviews-widget.js'
+    | '/api/public/reviews.json'
+    | '/api/public/hooks/scrape-reviews'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/public/reviews-widget.js'
+    | '/api/public/reviews.json'
+    | '/api/public/hooks/scrape-reviews'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicReviewsWidgetDotjsRoute: typeof ApiPublicReviewsWidgetDotjsRoute
+  ApiPublicReviewsDotjsonRoute: typeof ApiPublicReviewsDotjsonRoute
   ApiPublicHooksScrapeReviewsRoute: typeof ApiPublicHooksScrapeReviewsRoute
 }
 
@@ -57,6 +91,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/reviews-widget.js': {
+      id: '/api/public/reviews-widget.js'
+      path: '/api/public/reviews-widget.js'
+      fullPath: '/api/public/reviews-widget.js'
+      preLoaderRoute: typeof ApiPublicReviewsWidgetDotjsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/reviews.json': {
+      id: '/api/public/reviews.json'
+      path: '/api/public/reviews.json'
+      fullPath: '/api/public/reviews.json'
+      preLoaderRoute: typeof ApiPublicReviewsDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/scrape-reviews': {
@@ -71,6 +119,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicReviewsWidgetDotjsRoute: ApiPublicReviewsWidgetDotjsRoute,
+  ApiPublicReviewsDotjsonRoute: ApiPublicReviewsDotjsonRoute,
   ApiPublicHooksScrapeReviewsRoute: ApiPublicHooksScrapeReviewsRoute,
 }
 export const routeTree = rootRouteImport
