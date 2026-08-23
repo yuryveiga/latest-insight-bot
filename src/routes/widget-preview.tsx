@@ -24,7 +24,7 @@ export const Route = createFileRoute("/widget-preview")({
 
 function WidgetPreview() {
   const hostRef = useRef<HTMLDivElement>(null);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(12);
   const [perPage, setPerPage] = useState(3);
 
   useEffect(() => {
