@@ -87,7 +87,7 @@ function WidgetPreview() {
         </div>
 
         <pre className="overflow-x-auto rounded-lg border border-border bg-muted p-4 text-xs">
-{`<div data-google-reviews data-limit="${limit}" data-per-page="${perPage}"></div>
+{`<div data-google-reviews data-limit="${limit}" data-per-page="${perPage}" data-autoplay="true" data-interval="6000"></div>
 <script async src="https://latest-insight-bot.lovable.app/api/public/reviews-widget.js"></script>`}
         </pre>
       </div>
