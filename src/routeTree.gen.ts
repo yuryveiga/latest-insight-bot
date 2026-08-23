@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WidgetPreviewRouteImport } from './routes/widget-preview'
 import { Route as ApiPublicReviewsWidgetDotjsRouteImport } from './routes/api/public/reviews-widget[.]js'
 import { Route as ApiPublicReviewsDotjsonRouteImport } from './routes/api/public/reviews[.]json'
 import { Route as ApiPublicHooksScrapeReviewsRouteImport } from './routes/api/public/hooks/scrape-reviews'
@@ -17,6 +18,11 @@ import { Route as ApiPublicHooksScrapeReviewsRouteImport } from './routes/api/pu
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WidgetPreviewRoute = WidgetPreviewRouteImport.update({
+  id: '/widget-preview',
+  path: '/widget-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicReviewsWidgetDotjsRoute =
@@ -39,12 +45,14 @@ const ApiPublicHooksScrapeReviewsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/widget-preview': typeof WidgetPreviewRoute
   '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
   '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
   '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/widget-preview': typeof WidgetPreviewRoute
   '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
   '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
   '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
@@ -52,6 +60,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/widget-preview': typeof WidgetPreviewRoute
   '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
   '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
   '/api/public/hooks/scrape-reviews': typeof ApiPublicHooksScrapeReviewsRoute
@@ -60,18 +69,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/widget-preview'
     | '/api/public/reviews-widget.js'
     | '/api/public/reviews.json'
     | '/api/public/hooks/scrape-reviews'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/widget-preview'
     | '/api/public/reviews-widget.js'
     | '/api/public/reviews.json'
     | '/api/public/hooks/scrape-reviews'
   id:
     | '__root__'
     | '/'
+    | '/widget-preview'
     | '/api/public/reviews-widget.js'
     | '/api/public/reviews.json'
     | '/api/public/hooks/scrape-reviews'
@@ -79,6 +91,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  WidgetPreviewRoute: typeof WidgetPreviewRoute
   ApiPublicReviewsWidgetDotjsRoute: typeof ApiPublicReviewsWidgetDotjsRoute
   ApiPublicReviewsDotjsonRoute: typeof ApiPublicReviewsDotjsonRoute
   ApiPublicHooksScrapeReviewsRoute: typeof ApiPublicHooksScrapeReviewsRoute
@@ -91,6 +104,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/widget-preview': {
+      id: '/widget-preview'
+      path: '/widget-preview'
+      fullPath: '/widget-preview'
+      preLoaderRoute: typeof WidgetPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/reviews-widget.js': {
@@ -119,6 +139,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  WidgetPreviewRoute: WidgetPreviewRoute,
   ApiPublicReviewsWidgetDotjsRoute: ApiPublicReviewsWidgetDotjsRoute,
   ApiPublicReviewsDotjsonRoute: ApiPublicReviewsDotjsonRoute,
   ApiPublicHooksScrapeReviewsRoute: ApiPublicHooksScrapeReviewsRoute,
