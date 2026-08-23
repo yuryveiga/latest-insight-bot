@@ -70,13 +70,13 @@ function WidgetPreview() {
             />
           </label>
           <label className="flex items-center gap-2">
-            Colunas:
+            Por slide:
             <input
               type="number"
               min={1}
-              max={4}
-              value={columns}
-              onChange={(e) => setColumns(Number(e.target.value))}
+              max={6}
+              value={perPage}
+              onChange={(e) => setPerPage(Number(e.target.value))}
               className="w-20 rounded border border-border bg-card px-2 py-1"
             />
           </label>
@@ -87,7 +87,7 @@ function WidgetPreview() {
         </div>
 
         <pre className="overflow-x-auto rounded-lg border border-border bg-muted p-4 text-xs">
-{`<div data-google-reviews data-limit="${limit}" data-columns="${columns}"></div>
+{`<div data-google-reviews data-limit="${limit}" data-per-page="${perPage}"></div>
 <script async src="https://latest-insight-bot.lovable.app/api/public/reviews-widget.js"></script>`}
         </pre>
       </div>
