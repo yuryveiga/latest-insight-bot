@@ -173,7 +173,6 @@ const SCRIPT = `(function () {
         function stop() { if (timer) { clearInterval(timer); timer = null; } }
         function start() {
           if (!autoplay || paused || total < 2) return;
-          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
           stop();
           timer = setInterval(function () { go(cur + 1, true); }, interval);
         }
