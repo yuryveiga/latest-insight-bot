@@ -14,16 +14,16 @@ export const Route = createFileRoute("/api/public/reviews.json")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data } = await supabaseAdmin
           .from("google_reviews")
-          .select("id, author, rating, relative_time, review_text, position")
+          .select("id, author, rating, relative_time, review_text, position, published_at")
           .order("position", { ascending: true })
-          .limit(10);
+          .limit(12);
 
         return Response.json(
           { reviews: data ?? [] },
           {
             headers: {
               ...CORS,
-              "Cache-Control": "public, max-age=300, s-maxage=3600",
+              "Cache-Control": "public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400",
             },
           },
         );

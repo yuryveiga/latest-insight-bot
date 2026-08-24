@@ -1,0 +1,1 @@
+ALTER TABLE public.google_reviews ADD COLUMN IF NOT EXISTS published_at timestamptz;

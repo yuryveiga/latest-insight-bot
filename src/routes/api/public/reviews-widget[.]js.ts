@@ -27,13 +27,23 @@ const SCRIPT = `(function () {
     return w.slice(0, max).join(" ") + "\\u2026";
   }
 
+  var DTF = null;
+  try { DTF = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "long", year: "numeric" }); } catch (e) {}
+  function fmtDate(r) {
+    if (r.published_at) {
+      var d = new Date(r.published_at);
+      if (!isNaN(d.getTime())) return DTF ? DTF.format(d) : d.toLocaleDateString();
+    }
+    return r.relative_time || "";
+  }
+
   function card(r) {
     var label = "Avaliação de " + (r.author || "visitante") +
       (r.rating != null ? ", " + Math.round(r.rating) + " de 5 estrelas" : "") +
       " — abrir no Google em nova aba";
     return '<li class="gr-item"><a class="gr-card" href="' + GOOGLE_URL + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(label) + '">' +
       '<div class="gr-head"><p class="gr-author">' + esc(r.author) + "</p>" +
-      '<span class="gr-time">' + esc(r.relative_time || "") + "</span></div>" +
+      '<span class="gr-time">' + esc(fmtDate(r)) + "</span></div>" +
       (r.rating != null ? stars(r.rating) : "") +
       (r.review_text ? '<p class="gr-text">' + esc(clamp(r.review_text, 30)) + "</p>" : "") +
       "</a></li>";
@@ -77,7 +87,7 @@ const SCRIPT = `(function () {
     + "@media(prefers-reduced-motion:reduce){.gr-track{transition:none}.gr-card:hover{transform:none}.gr-line{animation:none}}";
 
   function mount(el) {
-    var limit = parseInt(el.getAttribute("data-limit") || "10", 10);
+    var limit = parseInt(el.getAttribute("data-limit") || "12", 10);
     var perPage = parseInt(el.getAttribute("data-per-page") || "3", 10);
     var autoplay = el.getAttribute("data-autoplay") !== "false";
     var interval = Math.max(2000, parseInt(el.getAttribute("data-interval") || "6000", 10));

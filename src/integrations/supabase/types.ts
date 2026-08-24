@@ -21,6 +21,7 @@ export type Database = {
           fingerprint: string
           id: string
           position: number
+          published_at: string | null
           rating: number | null
           relative_time: string | null
           review_text: string | null
@@ -32,6 +33,7 @@ export type Database = {
           fingerprint: string
           id?: string
           position?: number
+          published_at?: string | null
           rating?: number | null
           relative_time?: string | null
           review_text?: string | null
@@ -43,6 +45,7 @@ export type Database = {
           fingerprint?: string
           id?: string
           position?: number
+          published_at?: string | null
           rating?: number | null
           relative_time?: string | null
           review_text?: string | null

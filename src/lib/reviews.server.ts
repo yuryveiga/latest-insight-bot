@@ -89,6 +89,7 @@ export async function runReviewScrape() {
         rating: r.rating,
         relative_time: r.relative_time,
         review_text: r.review_text,
+        published_at: r.published_at ?? null,
         position: i,
         scraped_at: new Date().toISOString(),
       }));
