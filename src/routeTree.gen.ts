@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PreviewMaracanaRouteImport } from './routes/preview-maracana'
 import { Route as WidgetPreviewRouteImport } from './routes/widget-preview'
 import { Route as ApiPublicReviewsWidgetDotjsRouteImport } from './routes/api/public/reviews-widget[.]js'
 import { Route as ApiPublicReviewsDotjsonRouteImport } from './routes/api/public/reviews[.]json'
@@ -18,6 +19,11 @@ import { Route as ApiPublicHooksScrapeReviewsRouteImport } from './routes/api/pu
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreviewMaracanaRoute = PreviewMaracanaRouteImport.update({
+  id: '/preview-maracana',
+  path: '/preview-maracana',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WidgetPreviewRoute = WidgetPreviewRouteImport.update({
@@ -45,6 +51,7 @@ const ApiPublicHooksScrapeReviewsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/preview-maracana': typeof PreviewMaracanaRoute
   '/widget-preview': typeof WidgetPreviewRoute
   '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
   '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
@@ -52,6 +59,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/preview-maracana': typeof PreviewMaracanaRoute
   '/widget-preview': typeof WidgetPreviewRoute
   '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
   '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
@@ -60,6 +68,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/preview-maracana': typeof PreviewMaracanaRoute
   '/widget-preview': typeof WidgetPreviewRoute
   '/api/public/reviews-widget.js': typeof ApiPublicReviewsWidgetDotjsRoute
   '/api/public/reviews.json': typeof ApiPublicReviewsDotjsonRoute
@@ -69,6 +78,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/preview-maracana'
     | '/widget-preview'
     | '/api/public/reviews-widget.js'
     | '/api/public/reviews.json'
@@ -76,6 +86,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/preview-maracana'
     | '/widget-preview'
     | '/api/public/reviews-widget.js'
     | '/api/public/reviews.json'
@@ -83,6 +94,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/preview-maracana'
     | '/widget-preview'
     | '/api/public/reviews-widget.js'
     | '/api/public/reviews.json'
@@ -91,6 +103,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PreviewMaracanaRoute: typeof PreviewMaracanaRoute
   WidgetPreviewRoute: typeof WidgetPreviewRoute
   ApiPublicReviewsWidgetDotjsRoute: typeof ApiPublicReviewsWidgetDotjsRoute
   ApiPublicReviewsDotjsonRoute: typeof ApiPublicReviewsDotjsonRoute
@@ -104,6 +117,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preview-maracana': {
+      id: '/preview-maracana'
+      path: '/preview-maracana'
+      fullPath: '/preview-maracana'
+      preLoaderRoute: typeof PreviewMaracanaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/widget-preview': {
@@ -139,6 +159,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PreviewMaracanaRoute: PreviewMaracanaRoute,
   WidgetPreviewRoute: WidgetPreviewRoute,
   ApiPublicReviewsWidgetDotjsRoute: ApiPublicReviewsWidgetDotjsRoute,
   ApiPublicReviewsDotjsonRoute: ApiPublicReviewsDotjsonRoute,
