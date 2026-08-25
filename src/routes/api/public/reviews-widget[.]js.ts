@@ -1,3 +1,53 @@
+/**
+ * WIDGET DE AVALIAÇÕES DO GOOGLE — guia de uso para o dono do site
+ * ---------------------------------------------------------------
+ * Embed (cole onde as reviews devem aparecer):
+ *
+ *   <div data-google-reviews data-limit="15">
+ *     <!-- conteúdo aqui dentro = fallback: fica visível se a API falhar -->
+ *   </div>
+ *   <script async src="https://latest-insight-bot.lovable.app/api/public/reviews-widget.js"></script>
+ *
+ * ATRIBUTOS (todos opcionais, no <div data-google-reviews ...>)
+ *
+ *  Conteúdo
+ *   data-limit="15"          Nº máximo de avaliações carregadas (padrão 15).
+ *   data-per-page="3"        Quantas por slide no desktop (1 mobile / 2 tablet). Máx 6.
+ *   data-fallback="false"    Desliga o fallback (não restaura o HTML original em caso de erro).
+ *
+ *  Autoplay
+ *   data-autoplay="false"    Desliga a rotação automática.
+ *   data-interval="6000"     Intervalo em ms entre slides (mínimo 2000).
+ *                            Pausa sozinho no hover, foco, toque e aba oculta.
+ *
+ *  Controles / layout
+ *   data-preset="clean"      Visual minimalista: setas sobre as bordas, sem bolinhas,
+ *                            sem botão play/pause e sem botão "Ver todas as avaliações".
+ *   data-arrows="edges"      Setas flutuando nas bordas do carrossel.
+ *   data-arrows="below"      Setas abaixo do carrossel (padrão).
+ *   data-arrows="false"      Sem setas.
+ *   data-dots="false"        Esconde as bolinhas indicadoras.
+ *   data-play-button="false" Esconde o botão de pausar/retomar (autoplay continua).
+ *   data-show-all="false"    Esconde o botão "Ver todas as avaliações".
+ *
+ *  Aparência
+ *   data-avatar="false"      Remove o círculo com a inicial do autor.
+ *   data-star-color="#84cc16"    Cor das estrelas.
+ *   data-card-bg="#ffffff"       Fundo do card.
+ *   data-card-border="#e5e7eb"   Cor da borda do card.
+ *   data-radius="16px"           Arredondamento do card.
+ *   data-avatar-bg="#f3f4f6"     Fundo do avatar.
+ *
+ *   Fonte e cor do texto são herdadas do site (font:inherit / color:inherit).
+ *   Para ajustes finos, sobrescreva no CSS do site as classes:
+ *   .gr-card .gr-author .gr-time .gr-text .gr-stars .gr-btn .gr-dot .gr-more
+ *
+ * EXEMPLO "idêntico ao layout do site" (clean, setas nas bordas):
+ *   <div data-google-reviews data-preset="clean" data-star-color="#84cc16"
+ *        data-card-bg="#ffffff" data-card-border="#e5e7eb" data-radius="16px"></div>
+ *
+ * OBS: as avaliações são atualizadas automaticamente nos dias 1 e 15 de cada mês.
+ */
 import { createFileRoute } from "@tanstack/react-router";
 
 const GOOGLE_URL =
@@ -74,6 +124,10 @@ const SCRIPT = `(function () {
     + ".gr-stars{display:block;margin-top:12px}"
     + ".gr-stars-on{color:var(--gr-star)}.gr-stars-off{opacity:.25}"
     + ".gr-text{margin:10px 0 0;font-size:.925rem;line-height:1.6;opacity:.85;white-space:pre-line}"
+    + ".gr-carousel.gr-has-edges{padding:0 0}"
+    + ".gr-arrow-edge{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:var(--gr-card-bg,#fff);box-shadow:0 2px 10px rgba(0,0,0,.12)}"
+    + ".gr-arrow-edge.gr-prev{left:6px}.gr-arrow-edge.gr-next{right:6px}"
+    + ".gr-nav:empty{display:none}"
     + ".gr-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;flex-wrap:wrap}"
     + ".gr-btn{appearance:none;border:1px solid rgba(0,0,0,.18);background:transparent;color:inherit;min-width:44px;min-height:44px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;line-height:1;padding:0}"
     + ".gr-btn:hover{background:rgba(0,0,0,.06);border-color:currentColor}"
@@ -98,7 +152,12 @@ const SCRIPT = `(function () {
     var limit = parseInt(el.getAttribute("data-limit") || "15", 10);
     var perPage = parseInt(el.getAttribute("data-per-page") || "3", 10);
     var autoplay = el.getAttribute("data-autoplay") !== "false";
-    var showAll = el.getAttribute("data-show-all") !== "false";
+    var preset = (el.getAttribute("data-preset") || "").toLowerCase();
+    var clean = preset === "clean";
+    var showAll = el.getAttribute("data-show-all") !== "false" && !(clean && el.getAttribute("data-show-all") === null);
+    var arrows = el.getAttribute("data-arrows") || (clean ? "edges" : "below");
+    var showDots = el.getAttribute("data-dots") !== "false" && !(clean && el.getAttribute("data-dots") === null);
+    var showPlay = el.getAttribute("data-play-button") !== "false" && !(clean && el.getAttribute("data-play-button") === null);
     var interval = Math.max(2000, parseInt(el.getAttribute("data-interval") || "6000", 10));
     perPage = Math.max(1, Math.min(6, perPage));
     var id = "gr" + ++uid;
@@ -146,21 +205,30 @@ const SCRIPT = `(function () {
             '" aria-controls="' + id + '-track" aria-label="Ir para o grupo ' + (j + 1) + ' de ' + total + '"></button>';
         }
 
+        function arrowBtn(kind) {
+          var edge = arrows === "edges" ? " gr-arrow-edge" : "";
+          return '<button type="button" class="gr-btn gr-' + kind + edge + '" aria-label="' +
+            (kind === "prev" ? "Avaliações anteriores" : "Próximas avaliações") +
+            '" aria-controls="' + id + '-track"><span aria-hidden="true">' +
+            (kind === "prev" ? "\\u2039" : "\\u203a") + "</span></button>";
+        }
+
         el.innerHTML = "<style>" + css + "</style>" +
           '<section class="gr-region" role="region" aria-roledescription="carrossel" aria-label="Avaliações do Google" tabindex="0">' +
           '<p class="gr-sr">Use as setas do teclado para navegar entre as avaliações.</p>' +
-          '<div class="gr-carousel">' +
+          '<div class="gr-carousel' + (arrows === "edges" ? " gr-has-edges" : "") + '">' +
           '<ul class="gr-track" id="' + id + '-track" aria-live="polite">' +
           slides.map(function (s, idx) {
             return '<li class="gr-slide" role="group" aria-roledescription="slide" aria-label="Grupo ' + (idx + 1) + ' de ' + total + '">' +
               "<ul style=\\"display:contents;list-style:none;margin:0;padding:0\\">" + s.map(card).join("") + "</ul></li>";
           }).join("") +
-          "</ul></div>" +
+          (arrows === "edges" ? arrowBtn("prev") + arrowBtn("next") : "") +
+          "</div>" +
           '<div class="gr-nav">' +
-            '<button type="button" class="gr-btn gr-prev" aria-label="Avaliações anteriores" aria-controls="' + id + '-track"><span aria-hidden="true">\\u2039</span></button>' +
-            '<div class="gr-dots">' + dots + "</div>" +
-            '<button type="button" class="gr-btn gr-next" aria-label="Próximas avaliações" aria-controls="' + id + '-track"><span aria-hidden="true">\\u203a</span></button>' +
-            (autoplay && total > 1 ? '<button type="button" class="gr-btn gr-play" aria-label="Pausar rotação automática"><span aria-hidden="true">\\u23F8</span></button>' : "") +
+            (arrows === "below" ? arrowBtn("prev") : "") +
+            (showDots ? '<div class="gr-dots">' + dots + "</div>" : "") +
+            (arrows === "below" ? arrowBtn("next") : "") +
+            (showPlay && autoplay && total > 1 ? '<button type="button" class="gr-btn gr-play" aria-label="Pausar rotação automática"><span aria-hidden="true">\\u23F8</span></button>' : "") +
           "</div>" +
           (showAll ? '<div class="gr-more-wrap"><a class="gr-more" href="' + GOOGLE_URL + '" target="_blank" rel="noopener noreferrer">Ver todas as avaliações<span class="gr-sr"> no Google (abre em nova aba)</span></a></div>' : "") +
           "</section>";
@@ -205,8 +273,8 @@ const SCRIPT = `(function () {
           if (v) stop(); else start();
         }
 
-        prev.addEventListener("click", function () { setPaused(true); go(cur - 1, true); });
-        next.addEventListener("click", function () { setPaused(true); go(cur + 1, true); });
+        if (prev) prev.addEventListener("click", function () { setPaused(true); go(cur - 1, true); });
+        if (next) next.addEventListener("click", function () { setPaused(true); go(cur + 1, true); });
         dotEls.forEach(function (d) {
           d.addEventListener("click", function () { setPaused(true); go(parseInt(d.getAttribute("data-i"), 10)); });
         });
