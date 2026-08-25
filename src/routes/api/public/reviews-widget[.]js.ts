@@ -162,7 +162,7 @@ const SCRIPT = `(function () {
             '<button type="button" class="gr-btn gr-next" aria-label="Próximas avaliações" aria-controls="' + id + '-track"><span aria-hidden="true">\\u203a</span></button>' +
             (autoplay && total > 1 ? '<button type="button" class="gr-btn gr-play" aria-label="Pausar rotação automática"><span aria-hidden="true">\\u23F8</span></button>' : "") +
           "</div>" +
-          '<div class="gr-more-wrap"><a class="gr-more" href="' + GOOGLE_URL + '" target="_blank" rel="noopener noreferrer">Ver todas as avaliações<span class="gr-sr"> no Google (abre em nova aba)</span></a></div>' +
+          (showAll ? '<div class="gr-more-wrap"><a class="gr-more" href="' + GOOGLE_URL + '" target="_blank" rel="noopener noreferrer">Ver todas as avaliações<span class="gr-sr"> no Google (abre em nova aba)</span></a></div>' : "") +
           "</section>";
 
         var region = el.querySelector(".gr-region");
