@@ -95,7 +95,7 @@ const SCRIPT = `(function () {
     + "@media(prefers-reduced-motion:reduce){.gr-track{transition:none}.gr-card:hover{transform:none}.gr-line{animation:none}}";
 
   function mount(el) {
-    var limit = parseInt(el.getAttribute("data-limit") || "12", 10);
+    var limit = parseInt(el.getAttribute("data-limit") || "15", 10);
     var perPage = parseInt(el.getAttribute("data-per-page") || "3", 10);
     var autoplay = el.getAttribute("data-autoplay") !== "false";
     var interval = Math.max(2000, parseInt(el.getAttribute("data-interval") || "6000", 10));
@@ -110,6 +110,11 @@ const SCRIPT = `(function () {
       if (v) el.style.setProperty(vars[a], v);
     });
     el.style.minHeight = el.style.minHeight || "";
+    var fallbackHTML = el.getAttribute("data-fallback") === "false" ? "" : el.innerHTML;
+    function useFallback() {
+      el.classList.remove("gr-widget");
+      el.innerHTML = fallbackHTML;
+    }
     var skel = "";
     for (var k = 0; k < perPage; k++) {
       skel += '<div class="gr-skel-card"><div class="gr-line" style="width:45%"></div>' +
@@ -124,7 +129,7 @@ const SCRIPT = `(function () {
       .then(function (r) { return r.json(); })
       .then(function (d) {
         var items = (d.reviews || []).slice(0, limit);
-        if (!items.length) { el.innerHTML = ""; return; }
+        if (!items.length) { useFallback(); return; }
         el.classList.add("gr-widget");
 
         var slides = [];
@@ -225,7 +230,7 @@ const SCRIPT = `(function () {
         go(0);
         start();
       })
-      .catch(function () { el.innerHTML = ""; });
+      .catch(function () { useFallback(); });
   }
 
   function init() {
