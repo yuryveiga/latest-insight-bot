@@ -16,7 +16,7 @@ export const Route = createFileRoute("/api/public/reviews.json")({
           .from("google_reviews")
           .select("id, author, rating, relative_time, review_text, position, published_at")
           .order("position", { ascending: true })
-          .limit(12);
+          .limit(15);
 
         return Response.json(
           { reviews: data ?? [] },

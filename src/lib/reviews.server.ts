@@ -37,7 +37,7 @@ export async function scrapeLatestReviews(): Promise<ScrapedReview[]> {
       },
       body: JSON.stringify({
         startUrls: [{ url: TARGET_URL }],
-        maxReviews: 12,
+        maxReviews: 15,
         reviewsSort: "newest",
         language: "pt-BR",
         personalData: true,
@@ -57,7 +57,7 @@ export async function scrapeLatestReviews(): Promise<ScrapedReview[]> {
     .sort((a, b) =>
       String(b.publishedAtDate ?? "").localeCompare(String(a.publishedAtDate ?? "")),
     )
-    .slice(0, 12)
+    .slice(0, 15)
     .map((r) => ({
       author: String(r.name ?? "Anônimo"),
       rating: typeof r.stars === "number" ? r.stars : null,
