@@ -98,6 +98,7 @@ const SCRIPT = `(function () {
     var limit = parseInt(el.getAttribute("data-limit") || "15", 10);
     var perPage = parseInt(el.getAttribute("data-per-page") || "3", 10);
     var autoplay = el.getAttribute("data-autoplay") !== "false";
+    var showAll = el.getAttribute("data-show-all") !== "false";
     var interval = Math.max(2000, parseInt(el.getAttribute("data-interval") || "6000", 10));
     perPage = Math.max(1, Math.min(6, perPage));
     var id = "gr" + ++uid;
