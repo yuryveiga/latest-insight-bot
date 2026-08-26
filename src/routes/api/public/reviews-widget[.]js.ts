@@ -224,7 +224,7 @@ const SCRIPT = `(function () {
             return '<li class="gr-slide" role="group" aria-roledescription="slide" aria-label="Grupo ' + (idx + 1) + ' de ' + total + '">' +
               "<ul style=\\"display:contents;list-style:none;margin:0;padding:0\\">" + s.map(card).join("") + "</ul></li>";
           }).join("") +
-          "</div>" +
+          "</ul></div>" +
           (arrows === "edges" ? arrowBtn("prev") + arrowBtn("next") : "") +
           "</div>" +
           '<div class="gr-nav">' +
