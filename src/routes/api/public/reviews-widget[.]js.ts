@@ -125,7 +125,7 @@ const SCRIPT = `(function () {
     + ".gr-stars-on{color:var(--gr-star)}.gr-stars-off{opacity:.25}"
     + ".gr-text{margin:10px 0 0;font-size:.925rem;line-height:1.6;opacity:.85;white-space:pre-line}"
     + ".gr-stage{position:relative}"
-    + ".gr-arrow-edge{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:var(--gr-card-bg,#fff);box-shadow:0 2px 10px rgba(0,0,0,.12);border-color:transparent}"
+    + ".gr-arrow-edge{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:var(--gr-card-bg,#fff);box-shadow:0 2px 12px rgba(0,0,0,.18);border-color:rgba(0,0,0,.10)}"
     + ".gr-arrow-edge.gr-prev{left:8px}.gr-arrow-edge.gr-next{right:8px}"
     + ".gr-nav:empty{display:none}"
     + ".gr-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;flex-wrap:wrap}"
