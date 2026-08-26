@@ -124,9 +124,10 @@ const SCRIPT = `(function () {
     + ".gr-stars{display:block;margin-top:12px}"
     + ".gr-stars-on{color:var(--gr-star)}.gr-stars-off{opacity:.25}"
     + ".gr-text{margin:10px 0 0;font-size:.925rem;line-height:1.6;opacity:.85;white-space:pre-line}"
-    + ".gr-carousel.gr-has-edges{padding:0 0}"
-    + ".gr-arrow-edge{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:var(--gr-card-bg,#fff);box-shadow:0 2px 10px rgba(0,0,0,.12)}"
-    + ".gr-arrow-edge.gr-prev{left:6px}.gr-arrow-edge.gr-next{right:6px}"
+    + ".gr-stage{position:relative}"
+    + ".gr-arrow-edge{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:var(--gr-card-bg,#fff);box-shadow:0 2px 10px rgba(0,0,0,.12);border-color:transparent}"
+    + ".gr-arrow-edge.gr-prev{left:-22px}.gr-arrow-edge.gr-next{right:-22px}"
+    + "@media(max-width:1100px){.gr-arrow-edge.gr-prev{left:2px}.gr-arrow-edge.gr-next{right:2px}}"
     + ".gr-nav:empty{display:none}"
     + ".gr-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;flex-wrap:wrap}"
     + ".gr-btn{appearance:none;border:1px solid rgba(0,0,0,.18);background:transparent;color:inherit;min-width:44px;min-height:44px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;line-height:1;padding:0}"
@@ -216,12 +217,14 @@ const SCRIPT = `(function () {
         el.innerHTML = "<style>" + css + "</style>" +
           '<section class="gr-region" role="region" aria-roledescription="carrossel" aria-label="Avaliações do Google" tabindex="0">' +
           '<p class="gr-sr">Use as setas do teclado para navegar entre as avaliações.</p>' +
-          '<div class="gr-carousel' + (arrows === "edges" ? " gr-has-edges" : "") + '">' +
+          '<div class="gr-stage">' +
+          '<div class="gr-carousel">' +
           '<ul class="gr-track" id="' + id + '-track" aria-live="polite">' +
           slides.map(function (s, idx) {
             return '<li class="gr-slide" role="group" aria-roledescription="slide" aria-label="Grupo ' + (idx + 1) + ' de ' + total + '">' +
               "<ul style=\\"display:contents;list-style:none;margin:0;padding:0\\">" + s.map(card).join("") + "</ul></li>";
           }).join("") +
+          "</div>" +
           (arrows === "edges" ? arrowBtn("prev") + arrowBtn("next") : "") +
           "</div>" +
           '<div class="gr-nav">' +
