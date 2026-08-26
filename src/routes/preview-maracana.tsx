@@ -27,6 +27,7 @@ const GOOGLE_URL =
 
 const EMBED = `<div
   data-google-reviews
+  data-preset="clean"
   data-limit="15"
   data-per-page="3"
   data-autoplay="true"
@@ -49,6 +50,7 @@ function PreviewMaracana() {
     const target = document.createElement("div");
     const attrs: Record<string, string> = {
       "data-google-reviews": "",
+      "data-preset": "clean",
       "data-limit": "15",
       "data-per-page": "3",
       "data-autoplay": "true",
