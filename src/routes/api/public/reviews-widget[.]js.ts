@@ -105,7 +105,8 @@ const SCRIPT = `(function () {
   }
 
   var css = ""
-    + ".gr-widget{font:inherit;color:inherit;--gr-star:#f5b301;--gr-card-bg:rgba(255,255,255,.03);--gr-card-border:rgba(0,0,0,.12);--gr-radius:12px;--gr-avatar-bg:rgba(0,0,0,.06)}"
+    + ".gr-widget{display:block!important;height:auto!important;min-height:0!important;max-height:none!important;margin-bottom:0!important;padding-bottom:0!important;font:inherit;color:inherit;--gr-star:#f5b301;--gr-card-bg:rgba(255,255,255,.03);--gr-card-border:rgba(0,0,0,.12);--gr-radius:12px;--gr-avatar-bg:rgba(0,0,0,.06)}"
+    + ".gr-region,.gr-stage{height:auto!important;min-height:0!important;margin-bottom:0!important;padding-bottom:0!important}"
     + ".gr-carousel{position:relative;overflow:hidden}"
     + ".gr-track{display:flex;transition:transform .4s ease;margin:0;padding:0;list-style:none}"
     + ".gr-slide{flex:0 0 100%;display:grid;gap:16px;list-style:none;margin:0;padding:2px}"
@@ -126,7 +127,8 @@ const SCRIPT = `(function () {
     + ".gr-text{margin:10px 0 0;font-size:.925rem;line-height:1.6;opacity:.85;white-space:pre-line}"
     + ".gr-stage{position:relative}"
     + ".gr-arrow-edge{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:var(--gr-card-bg,#fff);box-shadow:0 2px 12px rgba(0,0,0,.18);border-color:rgba(0,0,0,.10)}"
-    + ".gr-arrow-edge.gr-prev{left:8px}.gr-arrow-edge.gr-next{right:8px}"
+    + ".gr-arrow-edge.gr-prev{left:-48px}.gr-arrow-edge.gr-next{right:-48px}"
+    + "@media(max-width:1100px){.gr-arrow-edge.gr-prev{left:8px}.gr-arrow-edge.gr-next{right:8px}}"
     + ".gr-nav:empty{display:none}"
     + ".gr-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;flex-wrap:wrap}"
     + ".gr-btn{appearance:none;border:1px solid rgba(0,0,0,.18);background:transparent;color:inherit;min-width:44px;min-height:44px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s;line-height:1;padding:0}"
