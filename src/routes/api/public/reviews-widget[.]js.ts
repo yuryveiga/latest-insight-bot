@@ -194,73 +194,12 @@ const SCRIPT = `(function () {
         if (!items.length) { useFallback(); return; }
         el.classList.add("gr-widget");
 
-        var slides = [];
-        for (var i = 0; i < items.length; i += perPage) slides.push(items.slice(i, i + perPage));
-        var total = slides.length;
         var cur = 0;
         var timer = null;
         var paused = false;
-
-        var dots = "";
-        for (var j = 0; j < total; j++) {
-          dots += '<button type="button" class="gr-dot" data-i="' + j + '" aria-current="' + (j === 0 ? "true" : "false") +
-            '" aria-controls="' + id + '-track" aria-label="Ir para o grupo ' + (j + 1) + ' de ' + total + '"></button>';
-        }
-
-        function arrowBtn(kind) {
-          var edge = arrows === "edges" ? " gr-arrow-edge" : "";
-          return '<button type="button" class="gr-btn gr-' + kind + edge + '" aria-label="' +
-            (kind === "prev" ? "Avaliações anteriores" : "Próximas avaliações") +
-            '" aria-controls="' + id + '-track"><span aria-hidden="true">' +
-            (kind === "prev" ? "\\u2039" : "\\u203a") + "</span></button>";
-        }
-
-        el.innerHTML = "<style>" + css + "</style>" +
-          '<section class="gr-region" role="region" aria-roledescription="carrossel" aria-label="Avaliações do Google" tabindex="0">' +
-          '<p class="gr-sr">Use as setas do teclado para navegar entre as avaliações.</p>' +
-          '<div class="gr-stage">' +
-          '<div class="gr-carousel">' +
-          '<ul class="gr-track" id="' + id + '-track" aria-live="polite">' +
-          slides.map(function (s, idx) {
-            return '<li class="gr-slide" role="group" aria-roledescription="slide" aria-label="Grupo ' + (idx + 1) + ' de ' + total + '">' +
-              "<ul style=\\"display:contents;list-style:none;margin:0;padding:0\\">" + s.map(card).join("") + "</ul></li>";
-          }).join("") +
-          "</ul></div>" +
-          (arrows === "edges" ? arrowBtn("prev") + arrowBtn("next") : "") +
-          "</div>" +
-          '<div class="gr-nav">' +
-            (arrows === "below" ? arrowBtn("prev") : "") +
-            (showDots ? '<div class="gr-dots">' + dots + "</div>" : "") +
-            (arrows === "below" ? arrowBtn("next") : "") +
-            (showPlay && autoplay && total > 1 ? '<button type="button" class="gr-btn gr-play" aria-label="Pausar rotação automática"><span aria-hidden="true">\\u23F8</span></button>' : "") +
-          "</div>" +
-          (showAll ? '<div class="gr-more-wrap"><a class="gr-more" href="' + GOOGLE_URL + '" target="_blank" rel="noopener noreferrer">Ver todas as avaliações<span class="gr-sr"> no Google (abre em nova aba)</span></a></div>' : "") +
-          "</section>";
-
-        var region = el.querySelector(".gr-region");
-        var track = el.querySelector(".gr-track");
-        var prev = el.querySelector(".gr-prev");
-        var next = el.querySelector(".gr-next");
-        var play = el.querySelector(".gr-play");
-        var dotEls = el.querySelectorAll(".gr-dot");
-        var slideEls = el.querySelectorAll(".gr-slide");
-
-        function go(n, wrap) {
-          if (wrap) cur = (n + total) % total;
-          else cur = Math.max(0, Math.min(total - 1, n));
-          track.style.transform = "translateX(-" + (cur * 100) + "%)";
-          dotEls.forEach(function (d, idx) { d.setAttribute("aria-current", idx === cur ? "true" : "false"); });
-          slideEls.forEach(function (s, idx) {
-            var hidden = idx !== cur;
-            s.setAttribute("aria-hidden", hidden ? "true" : "false");
-            s.querySelectorAll("a").forEach(function (a) {
-              if (hidden) a.setAttribute("tabindex", "-1");
-              else a.removeAttribute("tabindex");
-            });
-          });
-          if (prev) prev.disabled = total <= 1;
-          if (next) next.disabled = total <= 1;
-        }
+        var total = 0;
+        var go = function () {};
+        var play = null;
 
         function stop() { if (timer) { clearInterval(timer); timer = null; } }
         function start() {
@@ -277,31 +216,115 @@ const SCRIPT = `(function () {
           if (v) stop(); else start();
         }
 
-        if (prev) prev.addEventListener("click", function () { setPaused(true); go(cur - 1, true); });
-        if (next) next.addEventListener("click", function () { setPaused(true); go(cur + 1, true); });
-        dotEls.forEach(function (d) {
-          d.addEventListener("click", function () { setPaused(true); go(parseInt(d.getAttribute("data-i"), 10)); });
-        });
-        if (play) play.addEventListener("click", function () { setPaused(!paused); });
+        function effPerPage() {
+          var w = window.innerWidth || document.documentElement.clientWidth || 0;
+          if (w < 640) return 1;
+          if (w < 1024) return Math.min(2, perPage);
+          return Math.min(3, perPage);
+        }
 
-        region.addEventListener("keydown", function (e) {
-          if (e.key === "ArrowLeft") { e.preventDefault(); setPaused(true); go(cur - 1, true); }
-          else if (e.key === "ArrowRight") { e.preventDefault(); setPaused(true); go(cur + 1, true); }
-          else if (e.key === "Home") { e.preventDefault(); setPaused(true); go(0); }
-          else if (e.key === "End") { e.preventDefault(); setPaused(true); go(total - 1); }
-        });
+        function arrowBtn(kind) {
+          var edge = arrows === "edges" ? " gr-arrow-edge" : "";
+          return '<button type="button" class="gr-btn gr-' + kind + edge + '" aria-label="' +
+            (kind === "prev" ? "Avaliações anteriores" : "Próximas avaliações") +
+            '" aria-controls="' + id + '-track"><span aria-hidden="true">' +
+            (kind === "prev" ? "\\u2039" : "\\u203a") + "</span></button>";
+        }
 
-        el.addEventListener("mouseenter", stop);
-        el.addEventListener("mouseleave", function () { if (autoplay) setPaused(false); });
-        el.addEventListener("focusin", stop);
-        el.addEventListener("focusout", function () { if (!paused) start(); });
-        el.addEventListener("touchstart", function () { setPaused(true); }, { passive: true });
+        function render() {
+          var pp = effPerPage();
+          var slides = [];
+          for (var i = 0; i < items.length; i += pp) slides.push(items.slice(i, i + pp));
+          total = slides.length;
+          if (cur >= total) cur = 0;
+
+          var dots = "";
+          for (var j = 0; j < total; j++) {
+            dots += '<button type="button" class="gr-dot" data-i="' + j + '" aria-current="' + (j === 0 ? "true" : "false") +
+              '" aria-controls="' + id + '-track" aria-label="Ir para o grupo ' + (j + 1) + ' de ' + total + '"></button>';
+          }
+
+          el.innerHTML = "<style>" + css + "</style>" +
+            '<section class="gr-region" role="region" aria-roledescription="carrossel" aria-label="Avaliações do Google" tabindex="0">' +
+            '<p class="gr-sr">Use as setas do teclado para navegar entre as avaliações.</p>' +
+            '<div class="gr-stage">' +
+            '<div class="gr-carousel">' +
+            '<ul class="gr-track" id="' + id + '-track" aria-live="polite">' +
+            slides.map(function (s, idx) {
+              return '<li class="gr-slide" role="group" aria-roledescription="slide" aria-label="Grupo ' + (idx + 1) + ' de ' + total + '">' +
+                "<ul style=\\"display:contents;list-style:none;margin:0;padding:0\\">" + s.map(card).join("") + "</ul></li>";
+            }).join("") +
+            "</ul></div>" +
+            (arrows === "edges" ? arrowBtn("prev") + arrowBtn("next") : "") +
+            "</div>" +
+            '<div class="gr-nav">' +
+              (arrows === "below" ? arrowBtn("prev") : "") +
+              (showDots ? '<div class="gr-dots">' + dots + "</div>" : "") +
+              (arrows === "below" ? arrowBtn("next") : "") +
+              (showPlay && autoplay && total > 1 ? '<button type="button" class="gr-btn gr-play" aria-label="Pausar rotação automática"><span aria-hidden="true">\\u23F8</span></button>' : "") +
+            "</div>" +
+            (showAll ? '<div class="gr-more-wrap"><a class="gr-more" href="' + GOOGLE_URL + '" target="_blank" rel="noopener noreferrer">Ver todas as avaliações<span class="gr-sr"> no Google (abre em nova aba)</span></a></div>' : "") +
+            "</section>";
+
+          var region = el.querySelector(".gr-region");
+          var track = el.querySelector(".gr-track");
+          var prev = el.querySelector(".gr-prev");
+          var next = el.querySelector(".gr-next");
+          play = el.querySelector(".gr-play");
+          var dotEls = el.querySelectorAll(".gr-dot");
+          var slideEls = el.querySelectorAll(".gr-slide");
+
+          go = function (n, wrap) {
+            if (wrap) cur = (n + total) % total;
+            else cur = Math.max(0, Math.min(total - 1, n));
+            track.style.transform = "translateX(-" + (cur * 100) + "%)";
+            dotEls.forEach(function (d, idx) { d.setAttribute("aria-current", idx === cur ? "true" : "false"); });
+            slideEls.forEach(function (s, idx) {
+              var hidden = idx !== cur;
+              s.setAttribute("aria-hidden", hidden ? "true" : "false");
+              s.querySelectorAll("a").forEach(function (a) {
+                if (hidden) a.setAttribute("tabindex", "-1");
+                else a.removeAttribute("tabindex");
+              });
+            });
+            if (prev) prev.disabled = total <= 1;
+            if (next) next.disabled = total <= 1;
+          };
+
+          if (prev) prev.addEventListener("click", function () { setPaused(true); go(cur - 1, true); });
+          if (next) next.addEventListener("click", function () { setPaused(true); go(cur + 1, true); });
+          dotEls.forEach(function (d) {
+            d.addEventListener("click", function () { setPaused(true); go(parseInt(d.getAttribute("data-i"), 10)); });
+          });
+          if (play) play.addEventListener("click", function () { setPaused(!paused); });
+
+          region.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowLeft") { e.preventDefault(); setPaused(true); go(cur - 1, true); }
+            else if (e.key === "ArrowRight") { e.preventDefault(); setPaused(true); go(cur + 1, true); }
+            else if (e.key === "Home") { e.preventDefault(); setPaused(true); go(0); }
+            else if (e.key === "End") { e.preventDefault(); setPaused(true); go(total - 1); }
+          });
+
+          el.addEventListener("mouseenter", stop);
+          el.addEventListener("mouseleave", function () { if (autoplay) setPaused(false); });
+          el.addEventListener("focusin", stop);
+          el.addEventListener("focusout", function () { if (!paused) start(); });
+          el.addEventListener("touchstart", function () { setPaused(true); }, { passive: true });
+
+          go(0);
+          start();
+        }
+
+        var rt = null;
+        window.addEventListener("resize", function () {
+          if (rt) clearTimeout(rt);
+          rt = setTimeout(function () { stop(); render(); }, 200);
+        });
         document.addEventListener("visibilitychange", function () {
           if (document.hidden) stop(); else if (!paused) start();
         });
 
-        go(0);
-        start();
+        render();
       })
       .catch(function () { useFallback(); });
   }
