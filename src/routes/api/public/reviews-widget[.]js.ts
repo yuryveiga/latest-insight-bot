@@ -197,6 +197,24 @@ const SCRIPT = `(function () {
         var cur = 0;
         var timer = null;
         var paused = false;
+        var total = 0;
+        var go = function () {};
+        var play = null;
+
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+        function start() {
+          if (!autoplay || paused || total < 2) return;
+          stop();
+          timer = setInterval(function () { go(cur + 1, true); }, interval);
+        }
+        function setPaused(v) {
+          paused = v;
+          if (play) {
+            play.setAttribute("aria-label", v ? "Retomar rotação automática" : "Pausar rotação automática");
+            play.innerHTML = '<span aria-hidden="true">' + (v ? "\\u25B6" : "\\u23F8") + "</span>";
+          }
+          if (v) stop(); else start();
+        }
 
         function effPerPage() {
           var w = window.innerWidth || document.documentElement.clientWidth || 0;
@@ -217,7 +235,7 @@ const SCRIPT = `(function () {
           var pp = effPerPage();
           var slides = [];
           for (var i = 0; i < items.length; i += pp) slides.push(items.slice(i, i + pp));
-          var total = slides.length;
+          total = slides.length;
           if (cur >= total) cur = 0;
 
           var dots = "";
@@ -252,11 +270,11 @@ const SCRIPT = `(function () {
           var track = el.querySelector(".gr-track");
           var prev = el.querySelector(".gr-prev");
           var next = el.querySelector(".gr-next");
-          var play = el.querySelector(".gr-play");
+          play = el.querySelector(".gr-play");
           var dotEls = el.querySelectorAll(".gr-dot");
           var slideEls = el.querySelectorAll(".gr-slide");
 
-          function go(n, wrap) {
+          go = function (n, wrap) {
             if (wrap) cur = (n + total) % total;
             else cur = Math.max(0, Math.min(total - 1, n));
             track.style.transform = "translateX(-" + (cur * 100) + "%)";
@@ -271,22 +289,7 @@ const SCRIPT = `(function () {
             });
             if (prev) prev.disabled = total <= 1;
             if (next) next.disabled = total <= 1;
-          }
-
-          function stop() { if (timer) { clearInterval(timer); timer = null; } }
-          function start() {
-            if (!autoplay || paused || total < 2) return;
-            stop();
-            timer = setInterval(function () { go(cur + 1, true); }, interval);
-          }
-          function setPaused(v) {
-            paused = v;
-            if (play) {
-              play.setAttribute("aria-label", v ? "Retomar rotação automática" : "Pausar rotação automática");
-              play.innerHTML = '<span aria-hidden="true">' + (v ? "\\u25B6" : "\\u23F8") + "</span>";
-            }
-            if (v) stop(); else start();
-          }
+          };
 
           if (prev) prev.addEventListener("click", function () { setPaused(true); go(cur - 1, true); });
           if (next) next.addEventListener("click", function () { setPaused(true); go(cur + 1, true); });
@@ -315,16 +318,11 @@ const SCRIPT = `(function () {
         var rt = null;
         window.addEventListener("resize", function () {
           if (rt) clearTimeout(rt);
-          rt = setTimeout(function () {
-            stop();
-            render();
-          }, 200);
+          rt = setTimeout(function () { stop(); render(); }, 200);
         });
-        function stop() { if (timer) { clearInterval(timer); timer = null; } }
         document.addEventListener("visibilitychange", function () {
           if (document.hidden) stop(); else if (!paused) start();
         });
-        function start() { /* placeholder, overwritten in render */ }
 
         render();
       })
