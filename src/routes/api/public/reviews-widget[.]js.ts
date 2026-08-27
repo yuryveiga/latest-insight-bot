@@ -292,7 +292,7 @@ const SCRIPT = `(function () {
         });
 
         el.addEventListener("mouseenter", stop);
-        el.addEventListener("mouseleave", function () { if (!paused) start(); });
+        el.addEventListener("mouseleave", function () { if (autoplay) setPaused(false); });
         el.addEventListener("focusin", stop);
         el.addEventListener("focusout", function () { if (!paused) start(); });
         el.addEventListener("touchstart", function () { setPaused(true); }, { passive: true });
